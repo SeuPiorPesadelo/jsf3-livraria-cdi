@@ -21,10 +21,19 @@ import br.com.caelum.livraria.util.RedirectView;
 @ViewScoped
 public class LivroBean {
 
+	private Integer livroId;
 	private Livro livro = new Livro();
 	private Integer autorId;
 	private List<Livro> livros = new DAO<Livro>(Livro.class).listaTodos();
 	private EntityManager em;
+
+	public Integer getLivroId() {
+		return livroId;
+	}
+
+	public void setLivroId(Integer livroId) {
+		this.livroId = livroId;
+	}
 
 	public Livro getLivro() {
 		return livro;
@@ -104,6 +113,18 @@ public class LivroBean {
 		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id", Livro.class);
 		query.setParameter("id", l.getId());
 		this.livro = query.getResultList().get(0);
+	}
+	
+	public void carregaPelaId(){
+		em = new DAO<Livro>(Livro.class).getEntityManager();
+		//busca com join fetch, pq o relacionamento é lazy
+		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id", Livro.class);
+		query.setParameter("id", livroId);
+		try {
+			this.livro = query.getResultList().get(0);
+		} catch (Exception e) {
+			throw new ValidatorException(new FacesMessage("Passe um id válido"));
+		}
 	}
 	
 	public void remover(Livro l){

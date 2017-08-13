@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:ui="http://java.sun.com/jsf/facelets">
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
 <ui:composition template="_template.xhtml">
+
+	<!-- essa f:viewAction, do JSF 2.2, serve p/
+		 passar os IDs por parametro na URL -->
+	<f:metadata>
+		<f:viewParam name="autorId" value="#{autorBean.autorId}"/>
+		<!-- só carrega se for diferente de null -->
+		<f:viewAction action="#{autorBean.carregarAutorPeloId}" if="#{param.autorId != null}"/>
+	</f:metadata>
+	
 	<ui:define name="titulo">
 		Novo Autor
 	</ui:define>
@@ -21,6 +30,12 @@
 						validatorMessage="O tamanho máximo p/ Nome é 30 caracteres">
 						<f:validateLength maximum="30" />
 					</h:inputText>
+					<h:outputLabel value="Email:" for="email" />
+					<h:inputText id="email" value="#{autorBean.autor.email}" required="true">
+						<!-- f:passThroughAttribute serve p/ passar o tipo de dado esperado
+						pro inputText, novidade do JSF 2.2 p/ usar novidades do HTML5 -->
+						<f:passThroughAttribute name="type" value="email"/>
+					</h:inputText>
 					<h:commandButton value="Gravar" action="#{autorBean.gravar}"/>
 				</h:panelGrid>
 			</fieldset>
@@ -35,9 +50,7 @@
 				</h:column>
 				<h:column>
 					<f:facet name="Editar"/>
-					<h:commandLink value="Editar" >
-					    <f:setPropertyActionListener target="#{autorBean.autor}" value="#{autor}" />
-					</h:commandLink>
+					<h:commandLink value="Editar" actionListener="#{autorBean.carregar(autor)}"/>
 				</h:column>
 				<h:column>
 					<f:facet name="Excluir"/>
