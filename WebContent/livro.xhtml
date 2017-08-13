@@ -10,7 +10,7 @@
 		Novo Livro
 	</ui:define>
 	<ui:define name="conteudo">
-		<h:form>
+		<h:form id="formCadastroLivro">
 			<h:messages id="messages"/>
 			<fieldset>
 				<legend>Dados do Livro</legend>
@@ -65,40 +65,57 @@
 						<f:facet name="header">Nome do Autor</f:facet>
 						<h:outputText value="#{autor.nome}"/>
 					</h:column>
+					<h:column>
+						<f:facet name="header">Remover</f:facet>
+						<h:commandLink value="X" action="#{livroBean.removerAutorDoLivro(autor)}"/>
+					</h:column>
 				</h:dataTable>
 			</fieldset>
 			
 			<h:commandButton value="Gravar" action="#{livroBean.gravar}">
 			<!-- @form envia o dormulario inteiro. render recebe
 					os ids dos componentes q serao atualizados  -->
-			    <f:ajax execute="@form" render="@form :tabelaLivros"/>
+			    <f:ajax execute="@form" render="@form :formTabelaLivros:tabelaLivros"/>
 			</h:commandButton>
 		</h:form>
 		
-		<h:dataTable id="tabelaLivros" value="#{livroBean.livros}" var="livro">
-			<h:column>
-				<f:facet name="header">Título</f:facet>
-				<h:outputText value="#{livro.titulo}"/>
-			</h:column>
-			<h:column>
-				<f:facet name="header">ISBN</f:facet>
-				<h:outputText value="#{livro.isbn}"/>
-			</h:column>
-			<h:column>
-				<f:facet name="header">Preço</f:facet>
-				<h:outputText value="#{livro.preco}">
-					<f:convertNumber type="currency" pattern="R$ #0.00" currencySymbol="R$" locale="pt_BR"/>
-				</h:outputText>
-			</h:column>
-			<h:column>
-				<f:facet name="header">Data de Lançamento</f:facet>
-				<!-- é necessário '.time' no final de atributos Calendar  p/
-					transformar o Calendar em Date-->
-				<h:outputLabel value="#{livro.dataLancamento.time}">
-					<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
-				</h:outputLabel>
-			</h:column>
-		</h:dataTable>
+		<h:form id="formTabelaLivros">
+			<h1>Livros</h1>
+			<h:dataTable id="tabelaLivros" value="#{livroBean.livros}" var="livro">
+				<h:column>
+					<f:facet name="header">Título</f:facet>
+					<h:outputText value="#{livro.titulo}"/>
+				</h:column>
+				<h:column>
+					<f:facet name="header">ISBN</f:facet>
+					<h:outputText value="#{livro.isbn}"/>
+				</h:column>
+				<h:column>
+					<f:facet name="header">Preço</f:facet>
+					<h:outputText value="#{livro.preco}">
+						<f:convertNumber type="currency" pattern="R$ #0.00" currencySymbol="R$" locale="pt_BR"/>
+					</h:outputText>
+				</h:column>
+				<h:column>
+					<f:facet name="header">Data de Lançamento</f:facet>
+					<!-- é necessário '.time' no final de atributos Calendar  p/
+						transformar o Calendar em Date-->
+					<h:outputLabel value="#{livro.dataLancamento.time}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+					</h:outputLabel>
+				</h:column>
+				<h:column>
+					<f:facet name="header">Editar</f:facet>
+					<h:commandLink value="Edita" action="#{livroBean.carregar(livro)}"/>
+				</h:column>
+				<h:column>
+					<f:facet name="header">Excluir</f:facet>
+					<h:commandLink value="Exclui" action="#{livroBean.remover(livro)}">
+						<f:ajax execute="@form" render="@form"/>
+					</h:commandLink>
+				</h:column>
+			</h:dataTable>
+		</h:form>
 	</ui:define>
 	<ui:define name="texto">
 	  	Cadastro de Livros

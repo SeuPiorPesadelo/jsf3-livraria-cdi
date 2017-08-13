@@ -10,7 +10,7 @@
 		Novo Autor
 	</ui:define>
 	<ui:define name="conteudo">
-		<h:form>
+		<h:form id="formAutor">
 			<h:messages id="messages"/>
 			<fieldset>
 				<legend>Dados do Autor</legend>
@@ -21,10 +21,34 @@
 						validatorMessage="O tamanho máximo p/ Nome é 30 caracteres">
 						<f:validateLength maximum="30" />
 					</h:inputText>
-					<h:commandButton value="Gravar" action="#{autorBean.gravar}" />
+					<h:commandButton value="Gravar" action="#{autorBean.gravar}"/>
 				</h:panelGrid>
 			</fieldset>
 		</h:form>
+		
+		<h:form id="formLivro">
+			<h1>Autores</h1>
+			<h:dataTable id="tabelaAutores" value="#{autorBean.autores}" var="autor">
+				<h:column>
+					<f:facet name="Nome"/>
+					<h:outputText value="#{autor.nome}"/>
+				</h:column>
+				<h:column>
+					<f:facet name="Editar"/>
+					<h:commandLink value="Editar" >
+					    <f:setPropertyActionListener target="#{autorBean.autor}" value="#{autor}" />
+					</h:commandLink>
+				</h:column>
+				<h:column>
+					<f:facet name="Excluir"/>
+					<h:commandLink value="X" actionListener="#{autorBean.deletaAutores(autor)}"/>
+				</h:column>
+			</h:dataTable>
+			
+			<h:commandButton value="Voltar" action="#{autorBean.vaiPraLivros}" immediate="true"/>
+			
+		</h:form>
+		
 	</ui:define>
 	<ui:define name="texto">
 	  	Cadastro de Autores

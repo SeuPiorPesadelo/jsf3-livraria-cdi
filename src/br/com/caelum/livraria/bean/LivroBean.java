@@ -4,11 +4,12 @@ import java.util.List;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import br.com.caelum.livraria.dao.DAO;
 import br.com.caelum.livraria.modelo.Autor;
@@ -23,6 +24,7 @@ public class LivroBean {
 	private Livro livro = new Livro();
 	private Integer autorId;
 	private List<Livro> livros = new DAO<Livro>(Livro.class).listaTodos();
+	private EntityManager em;
 
 	public Livro getLivro() {
 		return livro;
@@ -38,9 +40,13 @@ public class LivroBean {
 			//p/ personalizacao de mensagem é necessário no 1º param o client Id, e no 2º a mensagem
 			FacesContext.getCurrentInstance().addMessage("autor",  new FacesMessage("Livro deve ter pelo menos um autor"));
 		}
-		new DAO<Livro>(Livro.class).adiciona(this.livro);
-		livro = new Livro();
+		if(this.livro.getId() == null){
+			new DAO<Livro>(Livro.class).adiciona(this.livro);
+		} else {
+			new DAO<Livro>(Livro.class).atualiza(this.livro);
+		}
 		livros = null;
+		livro = new Livro();
 	}
 
 	public void gravarAutor(){
@@ -72,6 +78,7 @@ public class LivroBean {
 	}
 
 	public List<Livro> getLivros() {
+		System.out.println("chamou getLivros()");
 		if(livros == null){
 			livros = new DAO<Livro>(Livro.class).listaTodos();
 		}
@@ -88,5 +95,24 @@ public class LivroBean {
 		//pq força um segundo request p/ o xhtml correspondente
 //		return "autor?faces-redirect=true";
 		return new RedirectView("autor");
+	}
+	
+	public void carregar(Livro l){
+		System.out.println("carregou");
+		em = new DAO<Livro>(Livro.class).getEntityManager();
+		//busca com join fetch, pq o relacionamento é lazy
+		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id", Livro.class);
+		query.setParameter("id", l.getId());
+		this.livro = query.getResultList().get(0);
+	}
+	
+	public void remover(Livro l){
+		System.out.println("deletou");
+		new DAO<Livro>(Livro.class).remove(l);
+		livros.remove(l);
+	}
+	
+	public void removerAutorDoLivro(Autor a){
+		livro.removeAutor(a);
 	}
 }

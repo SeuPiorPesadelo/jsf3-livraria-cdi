@@ -90,4 +90,7 @@ public class DAO<T> {
 		return lista;
 	}
 
+	public EntityManager getEntityManager(){
+		return  new JPAUtil().getEntityManager();
+	}
 }

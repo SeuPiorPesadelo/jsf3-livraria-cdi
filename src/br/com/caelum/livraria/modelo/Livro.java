@@ -77,4 +77,8 @@ public class Livro {
 	public void setDataLancamento(Calendar dataLancamento) {
 		this.dataLancamento = dataLancamento;
 	}
+
+	public void removeAutor(Autor a) {
+		this.autores.remove(a);
+	}
 }
