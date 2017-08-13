@@ -4,6 +4,7 @@ import javax.faces.bean.ManagedBean;
 
 import br.com.caelum.livraria.dao.DAO;
 import br.com.caelum.livraria.modelo.Autor;
+import br.com.caelum.livraria.util.RedirectView;
 
 @ManagedBean
 public class AutorBean {
@@ -14,10 +15,12 @@ public class AutorBean {
 		return autor;
 	}
 
-	public void gravar() {
+	public RedirectView gravar() {
 		System.out.println("Gravando autor " + this.autor.getNome());
 		new DAO<Autor>(Autor.class).adiciona(this.autor);
-		//faz zerar os campos no cadastro de autores;
-		autor = new Autor();
+		//?faces-redirect=true faz a URI atualizar
+		//pq força um segundo request p/ o xhtml correspondente
+		//return "livro?faces-redirect=true";
+		return new RedirectView("livro");
 	}
 }

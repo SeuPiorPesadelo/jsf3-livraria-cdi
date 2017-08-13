@@ -13,6 +13,7 @@ import javax.faces.validator.ValidatorException;
 import br.com.caelum.livraria.dao.DAO;
 import br.com.caelum.livraria.modelo.Autor;
 import br.com.caelum.livraria.modelo.Livro;
+import br.com.caelum.livraria.util.RedirectView;
 
 @ManagedBean
 //@RequestScoped //é o padrão
@@ -21,6 +22,7 @@ public class LivroBean {
 
 	private Livro livro = new Livro();
 	private Integer autorId;
+	private List<Livro> livros = new DAO<Livro>(Livro.class).listaTodos();
 
 	public Livro getLivro() {
 		return livro;
@@ -37,6 +39,8 @@ public class LivroBean {
 			FacesContext.getCurrentInstance().addMessage("autor",  new FacesMessage("Livro deve ter pelo menos um autor"));
 		}
 		new DAO<Livro>(Livro.class).adiciona(this.livro);
+		livro = new Livro();
+		livros = null;
 	}
 
 	public void gravarAutor(){
@@ -65,5 +69,24 @@ public class LivroBean {
 			//ValidatorException diz ao JSF q algo deu errado
 			throw new ValidatorException(new FacesMessage("Deve começar com 1"));
 		}
+	}
+
+	public List<Livro> getLivros() {
+		if(livros == null){
+			livros = new DAO<Livro>(Livro.class).listaTodos();
+		}
+		return livros;
+	}
+
+	public void setLivros(List<Livro> livros) {
+		this.livros = livros;
+	}
+	
+	public RedirectView formAutor(){
+		System.out.println("Executou o formAutor");
+		//?faces-redirect=true faz a URI atualizar
+		//pq força um segundo request p/ o xhtml correspondente
+//		return "autor?faces-redirect=true";
+		return new RedirectView("autor");
 	}
 }

@@ -3,22 +3,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core">
+
+<h:head>
+	<!-- apenas colocando o <h:head> o JSF já importa o JS necessário p/ o AJAX-->
+</h:head>
+
 <h:body>
 	<h1>Novo Livro</h1>
 	<h:form>
-	<h:messages/>
+	<h:messages id="messages"/>
 		<fieldset>
 			<legend>Dados do Livro</legend>
 			<h:panelGrid columns="2">
 				<h:outputLabel value="Titulo:" for="titulo" />
 				<h:inputText id="titulo" value="#{livroBean.livro.titulo}" required="true"
 					requiredMessage="Titulo Obrigatório"
-					validatorMessage="O tamanho máximo p/ Titulo é 20 caracteres">
-					<f:validateLength maximum="20"/>
+					validatorMessage="O tamanho máximo p/ Titulo é 40 caracteres">
+					<f:validateLength maximum="40"/>
+					<!-- quando perde o foco no titulo, o AJAX já faz a validacao -->
+					<f:ajax event="blur" render="messages"/>
 				</h:inputText>
 				<h:outputLabel value="ISBN:" for="isbn"/>
 				<h:inputText id="isbn" value="#{livroBean.livro.isbn}"
-					validator="#{livroBean.comecaComDigitoUm}"/>
+					validator="#{livroBean.comecaComDigitoUm}">
+					<f:ajax event="keyup" render="messages"/>	
+				</h:inputText>
 				<h:outputLabel value="Preço:" for="preco" />
 				<h:inputText id="preco" value="#{livroBean.livro.preco}">
 					<f:validateDoubleRange minimum="1" maximum="1000"/>
@@ -30,30 +39,66 @@
 				</h:inputText>
 			</h:panelGrid>
 		</fieldset>
+		
 		<fieldset>
 			<legend>Dados do Autor</legend>
 			<h:outputLabel value="Selecione o Autor" for="titulo" />
-			<h:selectOneMenu value="#{livroBean.autorId}">
+			<h:selectOneMenu id="autor" value="#{livroBean.autorId}">
 				<f:selectItems value="#{livroBean.autores}" var="autor"
 					itemLabel="#{autor.nome}" itemValue="#{autor.id}"/>
 			</h:selectOneMenu>
-			<h:commandButton value="Gravar Autor" action="#{livroBean.gravarAutor}"/>
-			<h:dataTable value="#{livroBean.autoresDoLivro}" var="autor">
+			
+			<h:commandButton value="Gravar Autor" actionListener="#{livroBean.gravarAutor}">
+				<!-- o AJAX faz o persist somente de autor. execute aponta para
+				 o id do component a ser gravado. Importar o JS no <h:head>-->
+				 <!-- render recebe os ids dos componentes q serao atualizados -->
+				<f:ajax execute="autor" render="tabelaAutores"/>
+			</h:commandButton>
+			
+			<br/>
+			<!-- immediate="true" garante q o formAutor() será executado na fase 2:Apply Request Values -->
+			<h:commandLink value="Cadastrar Novo Autor" action="#{livroBean.formAutor}" immediate="true"/>
+			<br/>
+			
+			<h:dataTable id="tabelaAutores" value="#{livroBean.autoresDoLivro}" var="autor">
 				<h:column>
 					<f:facet name="header">Nome do Autor</f:facet>
-					<h:outputLabel value="#{autor.nome}"/>
-				</h:column>
-				<h:column>
-					<f:facet name="header">Data de Lançamento</f:facet>
-					<!-- é necessário '.time' no final de atributos Calendar  p/
-						transformar o Calendar em Date-->
-					<h:outputLabel value="#{livroBean.livro.dataLancamento.time}">
-						<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
-					</h:outputLabel>
+					<h:outputText value="#{autor.nome}"/>
 				</h:column>
 			</h:dataTable>
 		</fieldset>
-		<h:commandButton value="Gravar" action="#{livroBean.gravar}" />
+		
+		<h:commandButton value="Gravar" action="#{livroBean.gravar}">
+		<!-- @form envia o dormulario inteiro. render recebe
+				os ids dos componentes q serao atualizados  -->
+		    <f:ajax execute="@form" render="@form :tabelaLivros"/>
+		</h:commandButton>
 	</h:form>
+	
+	<h:dataTable id="tabelaLivros" value="#{livroBean.livros}" var="livro">
+		<h:column>
+			<f:facet name="header">Título</f:facet>
+			<h:outputText value="#{livro.titulo}"/>
+		</h:column>
+		<h:column>
+			<f:facet name="header">ISBN</f:facet>
+			<h:outputText value="#{livro.isbn}"/>
+		</h:column>
+		<h:column>
+			<f:facet name="header">Preço</f:facet>
+			<h:outputText value="#{livro.preco}">
+				<f:convertNumber type="currency" pattern="R$ #0.00" currencySymbol="R$" locale="pt_BR"/>
+			</h:outputText>
+		</h:column>
+		<h:column>
+			<f:facet name="header">Data de Lançamento</f:facet>
+			<!-- é necessário '.time' no final de atributos Calendar  p/
+				transformar o Calendar em Date-->
+			<h:outputLabel value="#{livro.dataLancamento.time}">
+				<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+			</h:outputLabel>
+		</h:column>
+	</h:dataTable>
+	
 </h:body>
 </html>
