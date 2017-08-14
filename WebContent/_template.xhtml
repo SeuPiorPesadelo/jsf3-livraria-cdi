@@ -13,6 +13,10 @@
 	<h:body>
 		<div id="cabecalho">
 			<h:graphicImage library="img" name="logo.png"/>
+			
+			<!-- exibe o usuario q está logado -->
+			<h:outputText value="Usuario Logado: #{sessionScope['usuarioLogado'].email}" />
+			
 			<h1><!--ui:insert diz q quem usar esse template
 			  poderá preencher o titulo da página-->
 				<ui:insert name="titulo"></ui:insert>
