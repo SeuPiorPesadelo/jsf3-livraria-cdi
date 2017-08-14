@@ -113,6 +113,7 @@ public class LivroBean {
 		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id", Livro.class);
 		query.setParameter("id", l.getId());
 		this.livro = query.getResultList().get(0);
+		em.close();
 	}
 	
 	public void carregaPelaId(){
@@ -125,6 +126,7 @@ public class LivroBean {
 		} catch (Exception e) {
 			throw new ValidatorException(new FacesMessage("Passe um id válido"));
 		}
+		em.close();
 	}
 	
 	public void remover(Livro l){

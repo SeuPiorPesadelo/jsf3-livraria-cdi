@@ -8,5 +8,8 @@
 	<!-- Define qual é a classe q captará o ciclo de vida JSF -->
 	<lifecycle>
 		<phase-listener>br.com.caelum.livraria.util.LogPhaseListener</phase-listener>
+		
+		<!-- cuida do Login -->
+		<phase-listener>br.com.caelum.livraria.util.Autorizador</phase-listener>
 	</lifecycle>
 </faces-config>
