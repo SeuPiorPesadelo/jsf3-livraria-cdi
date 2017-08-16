@@ -14,8 +14,14 @@
 		<div id="cabecalho">
 			<h:graphicImage library="img" name="logo.png"/>
 			
+			<!-- exibe o Logout se usuario estiver logado -->
+			<h:form rendered="#{usuarioLogado != null}">
+				<h:commandLink value="Logout" action="#{loginBean.deslogar}"/>
+			</h:form>
+			
 			<!-- exibe o usuario q está logado -->
-			<h:outputText value="Usuario Logado: #{sessionScope['usuarioLogado'].email}" />
+			<h:outputText  rendered="#{usuarioLogado != null}"
+			  value="Usuario Logado: #{sessionScope['usuarioLogado'].email}" />
 			
 			<h1><!--ui:insert diz q quem usar esse template
 			  poderá preencher o titulo da página-->

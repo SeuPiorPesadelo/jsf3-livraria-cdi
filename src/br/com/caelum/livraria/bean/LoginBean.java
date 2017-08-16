@@ -1,5 +1,8 @@
 package br.com.caelum.livraria.bean;
 
+import java.io.Serializable;
+
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -10,8 +13,9 @@ import br.com.caelum.livraria.util.RedirectView;
 
 @ManagedBean
 @ViewScoped
-public class LoginBean {
+public class LoginBean implements Serializable {
 
+	private static final long serialVersionUID = -6391543426027494349L;
 	private Usuario usuario = new Usuario();
 
 	public Usuario getUsuario() {
@@ -20,13 +24,27 @@ public class LoginBean {
 
 	public RedirectView efetuarLogin(){
 		boolean existe = new UsuarioDao().existe(this.usuario);
+		FacesContext fc = FacesContext.getCurrentInstance();
 		if(existe){
-			FacesContext fc = FacesContext.getCurrentInstance();
 			//guarda os dados do usuario na chave usuarioLogado
 			fc.getExternalContext().getSessionMap().put("usuarioLogado", this.usuario);
 			return new RedirectView("livro");
 		}
-		return null;
+		//é um boa prática usar o ?faces-redirect=true p/ navegar p/ outra página, ou seja,
+		//fazer um redirecionamento após submeter um formulário, para limpar os dados da requisição,
+		//entao, p/ manter a mensagem global é usado getFlash() para durar nas duas
+		//requisicoes q serão geradas por causa do ?faces-redirect=true
+		fc.getExternalContext().getFlash().setKeepMessages(true);
+		//primeiro param é o id do componente q a msg será vinculada
+		//no caso é null, entao, essa msg será global, estará vinculada ao h:messages globalOnly="true"
+		fc.addMessage(null, new FacesMessage("Usuário não encontrado"));
+		return new RedirectView("login");
 	}
 
+	public RedirectView deslogar(){
+		FacesContext fc = FacesContext.getCurrentInstance();
+		//remove o usuario logado
+		fc.getExternalContext().getSessionMap().remove("usuarioLogado");
+		return new RedirectView("login");
+	}
 }
