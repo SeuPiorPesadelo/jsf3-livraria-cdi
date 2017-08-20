@@ -27,4 +27,10 @@ version="3.0">
 	        true
 	    </param-value>
 	</context-param>
+	
+	<!-- habilita a utilização dos icones do primefaces -->
+	<context-param>
+	    <param-name>primefaces.FONT_AWESOME</param-name>
+	    <param-value>true</param-value>
+	</context-param>
 </web-app>
