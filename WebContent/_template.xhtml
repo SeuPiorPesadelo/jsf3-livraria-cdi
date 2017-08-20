@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
 	
 	<h:head>
 		<!-- apenas colocando o <h:head> o JSF já importa
@@ -14,14 +15,24 @@
 		<div id="cabecalho">
 			<h:graphicImage library="img" name="logo.png"/>
 			
-			<!-- exibe o Logout se usuario estiver logado -->
+			<!-- quando existir alguma msg o autoUpdate="true" exibirá -->
+			<p:growl id="messages" showDetail="true" autoUpdate="true"/>
+			
+			<!-- se o usuario nao está logado nao exibe o menu -->
 			<h:form rendered="#{usuarioLogado != null}">
-				<h:commandLink value="Logout" action="#{loginBean.deslogar}"/>
+			    <p:menuButton value="Menu">
+			        <p:menuitem value="Livros" action="livro" icon="fa fa-fw fa-address-book"/>
+			        <p:menuitem value="Autores" action="autor" icon="fa fa-fw fa-edit"/>
+			        <p:separator />
+			        <p:menuitem value="Logout" action="#{loginBean.deslogar}" icon="fa fa-fw fa-sign-out"/>
+			    </p:menuButton>
 			</h:form>
 			
 			<!-- exibe o usuario q está logado -->
-			<h:outputText  rendered="#{usuarioLogado != null}"
-			  value="Usuario Logado: #{sessionScope['usuarioLogado'].email}" />
+			<p:outputPanel>
+				<h:outputText  rendered="#{usuarioLogado != null}"
+				  value="Usuario Logado: #{sessionScope['usuarioLogado'].email}" />
+			</p:outputPanel>
 			
 			<h1><!--ui:insert diz q quem usar esse template
 			  poderá preencher o titulo da página-->
