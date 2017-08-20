@@ -3,126 +3,149 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
 
 <ui:composition template="_template.xhtml">
 
 	<!-- essa f:viewAction, do JSF 2.2, serve p/ passar os IDs por parametro na URL -->
 	<f:metadata>
-	    <f:viewParam name="livroId" value="#{livroBean.livroId}"/>
-	    <!-- só carrega se for diferente de null -->
-	    <f:viewAction action="#{livroBean.carregaPelaId}" if="#{param['livroId'] != null}"/>
+		<f:viewParam name="livroId" value="#{livroBean.livroId}" />
+		<!-- só carrega se for diferente de null -->
+		<f:viewAction action="#{livroBean.carregaPelaId}"
+			if="#{param['livroId'] != null}" />
 	</f:metadata>
 
 	<ui:define name="titulo">
-		Novo Livro
+		<p:outputPanel>Novo Livro</p:outputPanel>
 	</ui:define>
 	<ui:define name="conteudo">
 		<h:form id="formCadastroLivro">
-			<h:messages id="messages"/>
-			<fieldset>
-				<legend>Dados do Livro</legend>
+			<h:messages id="messages" />
+			<p:fieldset legend="Dados do Livro">
 				<h:panelGrid columns="2">
-					<h:outputLabel value="Titulo:" for="titulo" />
-					<h:inputText id="titulo" value="#{livroBean.livro.titulo}" required="true"
-						requiredMessage="Titulo Obrigatório"
+					<p:outputLabel value="Titulo:" for="titulo" />
+					<p:inputText id="titulo" value="#{livroBean.livro.titulo}"
+						required="true" requiredMessage="Titulo Obrigatório"
 						validatorMessage="O tamanho máximo p/ Titulo é 40 caracteres">
-						<f:validateLength maximum="40"/>
+						<f:validateLength maximum="40" />
 						<!-- quando perde o foco no titulo, o AJAX já faz a validacao -->
-						<f:ajax event="blur" render="messages"/>
-					</h:inputText>
-					<h:outputLabel value="ISBN:" for="isbn"/>
-					<h:inputText id="isbn" value="#{livroBean.livro.isbn}"
-						validator="#{livroBean.comecaComDigitoUm}">
-						<f:ajax event="keyup" render="messages"/>	
-					</h:inputText>
-					<h:outputLabel value="Preço:" for="preco" />
-					<h:inputText id="preco" value="#{livroBean.livro.preco}">
-						<f:validateDoubleRange minimum="1" maximum="1000"/>
-					</h:inputText>
-					<h:outputLabel value="Data de Lançamento:" for="dataLancamento" />
-					<h:inputText id="dataLancamento"
-						value="#{livroBean.livro.dataLancamento.time}">
-						<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
-					</h:inputText>
+						<f:ajax event="blur" render="messages" />
+					</p:inputText>
+					<p:outputLabel value="ISBN:" for="isbn" />
+					<p:inputMask id="isbn" value="#{livroBean.livro.isbn}"
+						validator="#{livroBean.comecaComDigitoUm}"
+						mask="999-9-99-999999-9">
+						<f:ajax event="keyup" render="messages" />
+					</p:inputMask>
+					<p:outputLabel value="Preço:" for="preco" />
+					<p:inputNumber id="preco" value="#{livroBean.livro.preco}">
+						<f:validateDoubleRange minimum="1" maximum="1000" />
+					</p:inputNumber>
+					<p:outputLabel value="Gênero:" for="genero" />
+					<p:selectOneMenu value="#{livroBean.livro.genero}" id="genero">
+						<f:selectItem itemLabel="Selecione..." itemValue="#{null}" />
+						<f:selectItems value="#{livroBean.generos}" />
+					</p:selectOneMenu>
+					<p:outputLabel value="Data de Lançamento:" for="dataLancamento" />
+					<p:calendar id="dataLancamento" pattern="dd/MM/yyyy HH:mm"
+						mask="true" value="#{livroBean.livro.dataLancamento.time}"
+						effect="fold" />
 				</h:panelGrid>
-			</fieldset>
-			
-			<fieldset>
-				<legend>Dados do Autor</legend>
-				<h:outputLabel value="Selecione o Autor" for="titulo" />
-				<h:selectOneMenu id="autor" value="#{livroBean.autorId}">
-					<f:selectItems value="#{livroBean.autores}" var="autor"
-						itemLabel="#{autor.nome}" itemValue="#{autor.id}"/>
-				</h:selectOneMenu>
-				
-				<h:commandButton value="Gravar Autor" actionListener="#{livroBean.gravarAutor}">
-					<!-- o AJAX faz o persist somente de autor. execute aponta para
-					 o id do component a ser gravado. Importar o JS no <h:head>-->
-					 <!-- render recebe os ids dos componentes q serao atualizados -->
-					<f:ajax execute="autor" render="tabelaAutores"/>
-				</h:commandButton>
-				
-				<br/>
-				<!-- immediate="true" garante q o formAutor() será executado na fase 2:Apply Request Values -->
-				<h:commandLink value="Cadastrar Novo Autor" action="#{livroBean.formAutor}" immediate="true"/>
-				<br/>
-				
-				<h:dataTable id="tabelaAutores" value="#{livroBean.autoresDoLivro}" var="autor">
-					<h:column>
+			</p:fieldset>
+
+			<p:fieldset legend="Dados do Autor">
+				<p:panelGrid columns="4">
+					<p:outputLabel value="Selecione o Autor" for="titulo" />
+					<p:selectOneMenu id="autor" value="#{livroBean.autorId}">
+						<f:selectItems value="#{livroBean.autores}" var="autor"
+							itemLabel="#{autor.nome}" itemValue="#{autor.id}" />
+					</p:selectOneMenu>
+					<p:commandButton value="Gravar Autor"
+						actionListener="#{livroBean.gravarAutor}" process="autor @this"
+						update="tabelaAutores">
+						<!-- process="autor @this" seta no bean o autorId e executa o metodo -->
+					</p:commandButton>
+					<p:commandLink value="Cadastrar Novo Autor"
+						action="#{livroBean.formAutor}" immediate="true" />
+				</p:panelGrid>
+
+				<p:dataTable id="tabelaAutores" value="#{livroBean.autoresDoLivro}"
+					var="autor" emptyMessage="Nenhum autor">
+					<p:column>
 						<f:facet name="header">Nome do Autor</f:facet>
-						<h:outputText value="#{autor.nome}"/>
-					</h:column>
-					<h:column>
+						<h:outputText value="#{autor.nome}" />
+					</p:column>
+					<p:column>
 						<f:facet name="header">Remover</f:facet>
-						<h:commandLink value="X" action="#{livroBean.removerAutorDoLivro(autor)}"/>
-					</h:column>
-				</h:dataTable>
-			</fieldset>
-			
-			<h:commandButton value="Gravar" action="#{livroBean.gravar}">
-			<!-- @form envia o dormulario inteiro. render recebe
-					os ids dos componentes q serao atualizados  -->
-			    <f:ajax execute="@form" render="@form :formTabelaLivros:tabelaLivros"/>
-			</h:commandButton>
+						<p:commandLink value="X"
+							action="#{livroBean.removerAutorDoLivro(autor)}"
+							update="tabelaAutores" process="@this" />
+					</p:column>
+				</p:dataTable>
+			</p:fieldset>
+
+			<p:commandButton value="Gravar"
+				update="@form :formTabelaLivros:tabelaLivros" process="@form"
+				action="#{livroBean.gravar}" />
 		</h:form>
-		
+
 		<h:form id="formTabelaLivros">
 			<h1>Livros</h1>
-			<h:dataTable id="tabelaLivros" value="#{livroBean.livros}" var="livro">
-				<h:column>
-					<f:facet name="header">Título</f:facet>
-					<h:outputText value="#{livro.titulo}"/>
-				</h:column>
-				<h:column>
-					<f:facet name="header">ISBN</f:facet>
-					<h:outputText value="#{livro.isbn}"/>
-				</h:column>
-				<h:column>
-					<f:facet name="header">Preço</f:facet>
+			<!-- realiza o binding com o LivroDataModel p/ fazer buscas em modo lazy.
+			p:dataTable precisa fazer uma requisição ajax e portanto é necessário que
+			ele se encontre dentro de um h:form p/ se trabalhar com lazy-->
+			<p:dataTable id="tabelaLivros" value="#{livroBean.livroDataModel}"
+				var="livro" lazy="true" emptyMessage="Não há Livros" rows="3"
+				paginator="true" widgetVar="tabelaLivros">
+				<f:facet name="header">Livros</f:facet>
+				<p:column headerText="Título" sortBy="#{livro.titulo}"
+					filterBy="#{livro.titulo}" filterMatchMode="contains">
+					<h:outputText value="#{livro.titulo}" />
+				</p:column>
+				<p:column headerText="ISBN" sortBy="#{livro.isbn}"
+					filterBy="#{livro.isbn}" filterMatchMode="contains">
+					<h:outputText value="#{livro.isbn}" />
+				</p:column>
+				<!-- filterFunction faz a execucao de um filtro personalizado no Bean -->
+				<p:column headerText="Preço" sortBy="#{livro.preco}"
+					filterBy="#{livro.preco}"
+					filterFunction="#{livroBean.precoEhMenor}">
 					<h:outputText value="#{livro.preco}">
-						<f:convertNumber type="currency" pattern="R$ #0.00" currencySymbol="R$" locale="pt_BR"/>
+						<f:convertNumber type="currency" pattern="R$ #0.00"
+							currencySymbol="R$" locale="pt_BR" />
 					</h:outputText>
-				</h:column>
-				<h:column>
-					<f:facet name="header">Data de Lançamento</f:facet>
+				</p:column>
+				<p:column headerText="Gênero" sortBy="#{livro.genero}"
+					filterBy="#{livro.genero}" filterMatchMode="startsWith">
+					<f:facet name="filter">
+						<p:selectOneMenu onchange="PF('tabelaLivros').filter()">
+							<f:selectItem itemLabel="Selecione..." itemValue="#{null}"
+								noSelectionOption="true" />
+							<f:selectItems value="#{livroBean.generos}" />
+						</p:selectOneMenu>
+					</f:facet>
+					<h:outputText value="#{livro.genero}" />
+				</p:column>
+				<p:column headerText="Data de Lançamento"
+					sortBy="#{livro.dataLancamento.time}">
 					<!-- é necessário '.time' no final de atributos Calendar  p/
 						transformar o Calendar em Date-->
-					<h:outputLabel value="#{livro.dataLancamento.time}">
-						<f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
-					</h:outputLabel>
-				</h:column>
-				<h:column>
+					<p:outputLabel value="#{livro.dataLancamento.time}">
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+					</p:outputLabel>
+				</p:column>
+				<p:column>
 					<f:facet name="header">Editar</f:facet>
-					<h:commandLink value="Edita" action="#{livroBean.carregar(livro)}"/>
-				</h:column>
-				<h:column>
+					<h:commandLink value="Edita" action="#{livroBean.carregar(livro)}" />
+				</p:column>
+				<p:column>
 					<f:facet name="header">Excluir</f:facet>
 					<h:commandLink value="Exclui" action="#{livroBean.remover(livro)}">
-						<f:ajax execute="@form" render="@form"/>
+						<f:ajax execute="@form" render="@form" />
 					</h:commandLink>
-				</h:column>
-			</h:dataTable>
+				</p:column>
+			</p:dataTable>
 		</h:form>
 	</ui:define>
 	<ui:define name="texto">

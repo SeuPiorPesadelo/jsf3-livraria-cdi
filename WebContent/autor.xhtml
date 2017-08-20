@@ -50,7 +50,6 @@
 		
 		<h:form id="formLivro">
 			<h1>Autores</h1>
-			
 			<p:dataList value="#{autorBean.autores}" var="autor" type="definition">
 		        <f:facet name="header">
 		            Nome
@@ -63,25 +62,7 @@
 		        <p:commandButton value="X" actionListener="#{autorBean.deletaAutores(autor)}"
 		          icon="fa fa-fw fa-edit" update="@form"/>
 		    </p:dataList>
-		 
-			
-			<h:dataTable id="tabelaAutores" value="#{autorBean.autores}" var="autor">
-				<h:column>
-					<f:facet name="Nome"/>
-					<h:outputText value="#{autor.nome}"/>
-				</h:column>
-				<h:column>
-					<f:facet name="Editar"/>
-					<h:commandLink value="Editar" actionListener="#{autorBean.carregar(autor)}"/>
-				</h:column>
-				<h:column>
-					<f:facet name="Excluir"/>
-					<h:commandLink value="X" actionListener="#{autorBean.deletaAutores(autor)}"/>
-				</h:column>
-			</h:dataTable>
-			
 			<h:commandButton value="Voltar" action="#{autorBean.vaiPraLivros}" immediate="true"/>
-			
 		</h:form>
 		
 	</ui:define>
