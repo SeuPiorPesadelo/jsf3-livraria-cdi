@@ -13,6 +13,8 @@ import javax.faces.validator.ValidatorException;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import org.primefaces.component.datatable.DataTable;
+
 import br.com.caelum.livraria.dao.DAO;
 import br.com.caelum.livraria.modelo.Autor;
 import br.com.caelum.livraria.modelo.Livro;
@@ -84,6 +86,10 @@ public class LivroBean {
 		}
 		livros = null;
 		livro = new Livro();
+		
+//		faz resetar os valores do filtro da Criteria da dataTable de livros
+		DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("formTabelaLivros:tabelaLivros");
+		dataTable.reset();
 	}
 
 	public void gravarAutor() {

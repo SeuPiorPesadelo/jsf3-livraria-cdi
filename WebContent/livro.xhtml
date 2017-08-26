@@ -87,7 +87,7 @@
 
 			<p:commandButton value="Gravar"
 				update="@form :formTabelaLivros:tabelaLivros" process="@form"
-				action="#{livroBean.gravar}" />
+				action="#{livroBean.gravar}"/>
 		</h:form>
 
 		<h:form id="formTabelaLivros">
@@ -97,16 +97,19 @@
 			ele se encontre dentro de um h:form p/ se trabalhar com lazy-->
 			<p:dataTable id="tabelaLivros" value="#{livroBean.livroDataModel}"
 				var="livro" lazy="true" emptyMessage="Não há Livros" rows="3"
-				paginator="true" widgetVar="tabelaLivros">
+				paginator="true" widgetVar="tabelaLivrosWid">
+				
 				<f:facet name="header">Livros</f:facet>
 				<p:column headerText="Título" sortBy="#{livro.titulo}"
 					filterBy="#{livro.titulo}" filterMatchMode="contains">
 					<h:outputText value="#{livro.titulo}" />
 				</p:column>
+				
 				<p:column headerText="ISBN" sortBy="#{livro.isbn}"
 					filterBy="#{livro.isbn}" filterMatchMode="contains">
 					<h:outputText value="#{livro.isbn}" />
 				</p:column>
+				
 				<!-- filterFunction faz a execucao de um filtro personalizado no Bean -->
 				<p:column headerText="Preço" sortBy="#{livro.preco}"
 					filterBy="#{livro.preco}"
@@ -116,10 +119,11 @@
 							currencySymbol="R$" locale="pt_BR" />
 					</h:outputText>
 				</p:column>
+				
 				<p:column headerText="Gênero" sortBy="#{livro.genero}"
 					filterBy="#{livro.genero}" filterMatchMode="startsWith">
 					<f:facet name="filter">
-						<p:selectOneMenu onchange="PF('tabelaLivros').filter()">
+						<p:selectOneMenu onchange="PF('tabelaLivrosWid').filter()">
 							<f:selectItem itemLabel="Selecione..." itemValue="#{null}"
 								noSelectionOption="true" />
 							<f:selectItems value="#{livroBean.generos}" />
@@ -127,6 +131,7 @@
 					</f:facet>
 					<h:outputText value="#{livro.genero}" />
 				</p:column>
+				
 				<p:column headerText="Data de Lançamento"
 					sortBy="#{livro.dataLancamento.time}">
 					<!-- é necessário '.time' no final de atributos Calendar  p/
@@ -135,10 +140,12 @@
 						<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
 					</p:outputLabel>
 				</p:column>
+				
 				<p:column>
 					<f:facet name="header">Editar</f:facet>
 					<h:commandLink value="Edita" action="#{livroBean.carregar(livro)}" />
 				</p:column>
+				
 				<p:column>
 					<f:facet name="header">Excluir</f:facet>
 					<h:commandLink value="Exclui" action="#{livroBean.remover(livro)}">
