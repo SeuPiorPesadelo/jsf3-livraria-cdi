@@ -4,9 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
-import br.com.caelum.livraria.dao.DAO;
+import br.com.caelum.livraria.dao.AutorDao;
 import br.com.caelum.livraria.modelo.Autor;
 import br.com.caelum.livraria.util.RedirectView;
 
@@ -21,11 +22,14 @@ public class AutorBean implements Serializable {
 	
 	//é um controle de versionamento desse bean
 	private static final long serialVersionUID = -6383412006308490877L;
+	//quem cuidará dessa instancia será o CDI
+	@Inject
+	private AutorDao autorDao;//CDI faz new AutorDao() por debaixo dos panos
 	
 	private Integer autorId;
 	private Autor autor = new Autor();
-	private List<Autor> autores = new DAO<Autor>(Autor.class).listaTodos();
-
+	private List<Autor> autores;
+	
 	public Integer getAutorId() {
 		return autorId;
 	}
@@ -41,7 +45,7 @@ public class AutorBean implements Serializable {
 	public List<Autor> getAutores() {
 		System.out.println("Chamou getAutores()");
 		if (autores == null) {
-			autores = new DAO<Autor>(Autor.class).listaTodos();
+			autores = autorDao.listaTodos();
 		}
 		return autores;
 	}
@@ -53,10 +57,10 @@ public class AutorBean implements Serializable {
 	public void gravar() {
 		System.out.println("Gravando autor " + this.autor.getNome());
 		if(this.autor.getId() == null){
-			new DAO<Autor>(Autor.class).adiciona(this.autor);
+			autorDao.adiciona(this.autor);
 			autores.add(this.autor);
 		} else {
-			new DAO<Autor>(Autor.class).atualiza(this.autor);
+			autorDao.atualiza(this.autor);
 			autores = null;
 		}
 		this.autor = new Autor();
@@ -67,7 +71,7 @@ public class AutorBean implements Serializable {
 	}
 
 	public void deletaAutores(Autor a) {
-		new DAO<Autor>(Autor.class).remove(a);
+		autorDao.remove(a);
 		System.out.println("Atribuiu nulo");
 		autores = null;
 	}
@@ -79,6 +83,6 @@ public class AutorBean implements Serializable {
 	}
 	
 	public void carregarAutorPeloId(){
-		this.autor = new DAO<Autor>(Autor.class).buscaPorId(autorId);
+		this.autor = autorDao.buscaPorId(autorId);
 	}
 }

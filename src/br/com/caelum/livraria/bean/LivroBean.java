@@ -10,13 +10,13 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
 
 import org.primefaces.component.datatable.DataTable;
 
-import br.com.caelum.livraria.dao.DAO;
+import br.com.caelum.livraria.dao.AutorDao;
+import br.com.caelum.livraria.dao.LivroDao;
 import br.com.caelum.livraria.modelo.Autor;
 import br.com.caelum.livraria.modelo.Livro;
 import br.com.caelum.livraria.modelo.LivroDataModel;
@@ -35,11 +35,15 @@ public class LivroBean implements Serializable {
 	private Integer livroId;
 	private Livro livro = new Livro();
 	private Integer autorId;
-	private List<Livro> livros = new DAO<Livro>(Livro.class).listaTodos();
-	private EntityManager em;
+	private List<Livro> livros;
 	private Livro livroSelecionado;
+	@Inject
 	private LivroDataModel livroDataModel = new LivroDataModel();
 	private List<String> generos = Arrays.asList("Romance", "Drama", "Ação");
+	@Inject
+	private LivroDao livroDao;
+	@Inject
+	private AutorDao autorDao;
 
 	public List<String> getGeneros() {
 	    return generos;
@@ -58,7 +62,7 @@ public class LivroBean implements Serializable {
 	}
 
 	public List<Autor> getAutores() {
-		return new DAO<Autor>(Autor.class).listaTodos();
+		return autorDao.listaTodos();
 	}
 
 	public Livro getLivroSelecionado() {
@@ -86,9 +90,9 @@ public class LivroBean implements Serializable {
 					new FacesMessage("Livro deve ter pelo menos um autor"));
 		}
 		if (this.livro.getId() == null) {
-			new DAO<Livro>(Livro.class).adiciona(this.livro);
+			livroDao.adiciona(this.livro);
 		} else {
-			new DAO<Livro>(Livro.class).atualiza(this.livro);
+			livroDao.atualiza(this.livro);
 		}
 		livros = null;
 		livro = new Livro();
@@ -99,8 +103,14 @@ public class LivroBean implements Serializable {
 	}
 
 	public void gravarAutor() {
-		Autor buscaPorId = new DAO<Autor>(Autor.class).buscaPorId(autorId);
+		Autor buscaPorId = autorDao.buscaPorId(autorId);
 		livro.adicionaAutor(buscaPorId);
+	}
+	
+	public void remover(Livro l) {
+		System.out.println("deletou");
+		livroDao.remove(l);
+		livros.remove(l);
 	}
 
 	public List<Autor> getAutoresDoLivro() {
@@ -129,7 +139,7 @@ public class LivroBean implements Serializable {
 	public List<Livro> getLivros() {
 		System.out.println("chamou getLivros()");
 		if (livros == null) {
-			livros = new DAO<Livro>(Livro.class).listaTodos();
+			livros = livroDao.listaTodos();
 		}
 		return livros;
 	}
@@ -146,38 +156,6 @@ public class LivroBean implements Serializable {
 		return new RedirectView("autor");
 	}
 
-	public void carregar(Livro l) {
-		System.out.println("carregou" + l);
-		em = new DAO<Livro>(Livro.class).getEntityManager();
-		// busca com join fetch, pq o relacionamento é lazy
-		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id",
-				Livro.class);
-		query.setParameter("id", l.getId());
-		System.out.println("é vazia: " + query.getResultList().isEmpty());
-		this.livro = query.getResultList().get(0);
-		em.close();
-	}
-
-	public void carregaPelaId() {
-		em = new DAO<Livro>(Livro.class).getEntityManager();
-		// busca com join fetch, pq o relacionamento é lazy
-		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id",
-				Livro.class);
-		query.setParameter("id", livroId);
-		try {
-			this.livro = query.getResultList().get(0);
-		} catch (Exception e) {
-			throw new ValidatorException(new FacesMessage("Passe um id válido"));
-		}
-		em.close();
-	}
-
-	public void remover(Livro l) {
-		System.out.println("deletou");
-		new DAO<Livro>(Livro.class).remove(l);
-		livros.remove(l);
-	}
-
 	public void removerAutorDoLivro(Autor a) {
 		livro.removeAutor(a);
 	}
@@ -187,19 +165,15 @@ public class LivroBean implements Serializable {
 	public boolean precoEhMenor(Object valorColuna, Object filtroDigitado, Locale locale) { // java.util.Locale
 		// tirando espaços do filtro
 		String textoDigitado = (filtroDigitado == null) ? null : filtroDigitado.toString().trim();
-
 		System.out.println("Filtrando pelo " + textoDigitado + ", Valor do elemento: " + valorColuna);
-
 		// o filtro é nulo ou vazio?
 		if (textoDigitado == null || textoDigitado.equals("")) {
 			return true;
 		}
-
 		// elemento da tabela é nulo?
 		if (valorColuna == null) {
 			return false;
 		}
-
 		try {
 			// fazendo o parsing do filtro para converter para Double
 			Double precoDigitado = Double.valueOf(textoDigitado);
@@ -208,10 +182,19 @@ public class LivroBean implements Serializable {
 			// comparando os valores, compareTo devolve um valor negativo se o
 			// value é menor do que o filtro
 			return precoColuna.compareTo(precoDigitado) < 0;
-
 		} catch (NumberFormatException e) {
 			// usuario nao digitou um numero
 			return false;
 		}
+	}
+	
+	public void carregar(Livro l) {
+		System.out.println("carregou" + l);
+		//carrega já com Autores
+		this.livro = livroDao.carregarComAutores(l);
+	}
+
+	public void carregaPelaId() {
+		this.livro = livroDao.carregaPelaId(livroId);
 	}
 }

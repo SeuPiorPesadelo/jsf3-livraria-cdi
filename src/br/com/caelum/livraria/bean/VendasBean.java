@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Random;
 
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
-import br.com.caelum.livraria.dao.DAO;
+import br.com.caelum.livraria.dao.LivroDao;
 import br.com.caelum.livraria.modelo.Livro;
 import br.com.caelum.livraria.modelo.Venda;
 
@@ -19,11 +20,11 @@ public class VendasBean implements Serializable {
 
 	//é um controle de versionamento desse bean
 	private static final long serialVersionUID = 8614028697905324892L;
-	
-	private BarChartModel vendasModel;
+	@Inject
+	private LivroDao livroDao;
 
 	public List<Venda> getVendas(long seed) {
-		List<Livro> livros = new DAO<Livro>(Livro.class).listaTodos();
+		List<Livro> livros = livroDao.listaTodos();
 		List<Venda> vendas = new ArrayList<Venda>();
 		Random r = new Random(seed);
 		for (Livro l : livros) {

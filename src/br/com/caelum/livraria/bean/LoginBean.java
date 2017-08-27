@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import br.com.caelum.livraria.dao.UsuarioDao;
@@ -17,7 +18,8 @@ public class LoginBean implements Serializable {
 
 	//é um controle de versionamento desse bean
 	private static final long serialVersionUID = -6391543426027494349L;
-	
+	@Inject
+	private UsuarioDao usuarioDao;
 	private Usuario usuario = new Usuario();
 
 	public Usuario getUsuario() {
@@ -25,7 +27,7 @@ public class LoginBean implements Serializable {
 	}
 
 	public RedirectView efetuarLogin(){
-		boolean existe = new UsuarioDao().existe(this.usuario);
+		boolean existe = usuarioDao.existe(this.usuario);
 		FacesContext fc = FacesContext.getCurrentInstance();
 		if(existe){
 			//guarda os dados do usuario na chave usuarioLogado

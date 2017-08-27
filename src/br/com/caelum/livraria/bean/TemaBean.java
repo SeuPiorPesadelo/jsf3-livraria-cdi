@@ -16,7 +16,6 @@ public class TemaBean implements Serializable{
 	private static final long serialVersionUID = -1866613777010698977L;
 	
 	private String tema = "bootstrap";
-	private String temas;
 
 	public String getTema() {
 		return tema;

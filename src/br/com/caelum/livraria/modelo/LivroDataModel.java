@@ -1,9 +1,11 @@
 package br.com.caelum.livraria.modelo;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.EntityManager;
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -12,25 +14,31 @@ import org.hibernate.criterion.Restrictions;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 
-import br.com.caelum.livraria.dao.DAO;
+import br.com.caelum.livraria.dao.LivroDao;
 
-//LazyDataModel
-public class LivroDataModel extends LazyDataModel<Livro> {
+public class LivroDataModel extends LazyDataModel<Livro> implements Serializable {
 
-	private static final long serialVersionUID = -5406372211973770161L;
-	private DAO<Livro> dao = new DAO<Livro>(Livro.class);
+	private static final long serialVersionUID = -1597533916810271875L;
+    @Inject
+    private LivroDao livroDao;
 
-	// Precisamos dizer ao LazyDataModel qual é o valor
-	// máximo de registros que possuímos de livros
-	public LivroDataModel() {
-		super.setRowCount(dao.quantidadeDeElementos());
-	}
-
+//  @PostConstruct só é chamado depois que seu objeto já foi
+//  construído, então passar a quantidade de linhas dentro do
+//  construtor LivroDataModel() vai dar NullPointer
+    @PostConstruct
+    void init(){
+        super.setRowCount(livroDao.quantidadeDeElementos());
+    }
+	
+//	public LivroDataModel() {
+//		vai dar NullPointer, coloque no @PostConstruct
+//		super.setRowCount(livroDao.quantidadeDeElementos());
+//	}
+	
 	@Override
 	public List<Livro> load(int inicio, int quantidade, String campoOrdenacao, SortOrder sentidoOrdenacao,
 			Map<String, Object> filtros) {
-		EntityManager em = dao.getEntityManager();
-		Session session = em.unwrap(Session.class);
+		Session session = livroDao.getSession();
 
 		Criteria criteria = session.createCriteria(Livro.class);
 		criteria.setFirstResult(inicio);
@@ -52,9 +60,9 @@ public class LivroDataModel extends LazyDataModel<Livro> {
 				criteria.addOrder(Order.desc(campoOrdenacao));
 			}
 		}
-
+		
+		@SuppressWarnings("unchecked")
 		List<Livro> list = criteria.list();
-		em.close();
 		return list;
 	}
 }
