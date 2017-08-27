@@ -3,19 +3,21 @@ package br.com.caelum.livraria.bean;
 import java.io.Serializable;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
 
 import br.com.caelum.livraria.dao.UsuarioDao;
 import br.com.caelum.livraria.modelo.Usuario;
 import br.com.caelum.livraria.util.RedirectView;
 
-@ManagedBean
+@Named
 @ViewScoped
 public class LoginBean implements Serializable {
 
+	//é um controle de versionamento desse bean
 	private static final long serialVersionUID = -6391543426027494349L;
+	
 	private Usuario usuario = new Usuario();
 
 	public Usuario getUsuario() {

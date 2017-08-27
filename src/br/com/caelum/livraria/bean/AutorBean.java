@@ -1,20 +1,27 @@
 package br.com.caelum.livraria.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.persistence.TypedQuery;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
 
 import br.com.caelum.livraria.dao.DAO;
 import br.com.caelum.livraria.modelo.Autor;
-import br.com.caelum.livraria.modelo.Livro;
 import br.com.caelum.livraria.util.RedirectView;
 
-@ManagedBean
+//@ManagedBean é do mundo JSF
+//@ViewScoped NÃO funciona com CDI
+//@Named é do mundo CDI
+//javax.faces.view.ViewScoped é do CDI
+@Named
 @ViewScoped
-public class AutorBean {
-
+public class AutorBean implements Serializable {
+	//CDI exije implements Serializable
+	
+	//é um controle de versionamento desse bean
+	private static final long serialVersionUID = -6383412006308490877L;
+	
 	private Integer autorId;
 	private Autor autor = new Autor();
 	private List<Autor> autores = new DAO<Autor>(Autor.class).listaTodos();

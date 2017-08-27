@@ -1,15 +1,20 @@
 package br.com.caelum.livraria.bean;
 
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import java.io.Serializable;
+
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
 
 //como este bean é sessionScope ele sebreviverá
 //durante o tempo q o usuario estiver logado,
 //logo, nao mudará de tema
-@SessionScoped
-@ManagedBean
-public class TemaBean {
+@Named
+@SessionScoped //javax.enterprise.context.SessionScoped é do mundo CDI
+public class TemaBean implements Serializable{
 
+	//é um controle de versionamento desse bean
+	private static final long serialVersionUID = -1866613777010698977L;
+	
 	private String tema = "bootstrap";
 	private String temas;
 

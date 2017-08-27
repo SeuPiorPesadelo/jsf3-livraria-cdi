@@ -1,15 +1,16 @@
 package br.com.caelum.livraria.bean;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
@@ -21,11 +22,16 @@ import br.com.caelum.livraria.modelo.Livro;
 import br.com.caelum.livraria.modelo.LivroDataModel;
 import br.com.caelum.livraria.util.RedirectView;
 
-@ManagedBean
-// @RequestScoped //é o padrão
+//javax.faces.bean.ViewScoped.ViewScoped NÃO funciona com CDI
+//@Named é do mundo CDI
+//javax.faces.view.ViewScoped é do CDI
+@Named
 @ViewScoped
-public class LivroBean {
+public class LivroBean implements Serializable {
 
+	//é um controle de versionamento desse bean
+	private static final long serialVersionUID = 7382097856949769773L;
+	
 	private Integer livroId;
 	private Livro livro = new Livro();
 	private Integer autorId;
@@ -141,12 +147,13 @@ public class LivroBean {
 	}
 
 	public void carregar(Livro l) {
-		System.out.println("carregou");
+		System.out.println("carregou" + l);
 		em = new DAO<Livro>(Livro.class).getEntityManager();
 		// busca com join fetch, pq o relacionamento é lazy
 		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id",
 				Livro.class);
 		query.setParameter("id", l.getId());
+		System.out.println("é vazia: " + query.getResultList().isEmpty());
 		this.livro = query.getResultList().get(0);
 		em.close();
 	}

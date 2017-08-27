@@ -90,4 +90,11 @@ public class Livro {
 	public void removeAutor(Autor a) {
 		this.autores.remove(a);
 	}
+
+	@Override
+	public String toString() {
+		return "Livro [id=" + id + ", titulo=" + titulo + ", isbn=" + isbn + ", preco=" + preco + ", genero=" + genero
+				+ ", dataLancamento=" + dataLancamento + "]";
+	}
+	
 }
