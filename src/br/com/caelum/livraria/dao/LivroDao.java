@@ -12,6 +12,7 @@ import javax.persistence.TypedQuery;
 
 import org.hibernate.Session;
 
+import br.com.caelum.livraria.log.Log;
 import br.com.caelum.livraria.modelo.Livro;
 
 public class LivroDao implements Serializable {
@@ -28,10 +29,12 @@ public class LivroDao implements Serializable {
 		this.dao = new DAO<Livro>(this.em, Livro.class);
 	}
 
+	@Log
 	public List<Livro> listaTodos() {
 		return dao.listaTodos();
 	}
 
+	@Log
 	public void adiciona(Livro livro) {
 		dao.adiciona(livro);
 	}
@@ -40,10 +43,12 @@ public class LivroDao implements Serializable {
 		dao.atualiza(livro);
 	}
 
+	@Log
 	public void remove(Livro l) {
 		dao.remove(l);
 	}
 
+	@Log
 	public Livro carregarComAutores(Livro l) {
 		// busca com join fetch, pq o relacionamento é lazy
 		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id",
@@ -52,6 +57,7 @@ public class LivroDao implements Serializable {
 		return query.getResultList().get(0);
 	}
 
+	@Log
 	public Livro carregaPelaId(Integer livroId) {
 		// busca com join fetch, pq o relacionamento é lazy
 		TypedQuery<Livro> query = em.createQuery("SELECT l FROM Livro l JOIN FETCH l.autores a WHERE l.id = :id",

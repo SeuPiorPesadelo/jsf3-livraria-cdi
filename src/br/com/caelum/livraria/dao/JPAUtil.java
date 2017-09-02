@@ -14,7 +14,7 @@ public class JPAUtil {
 
 	//quanto tiver um @Inject de EntityManager o ...
 	@Produces//@Produces dirá pro CDI q é esse metodo q produzirá o EM
-	@RequestScoped//@RequestScoped - produzirá a cada requisicao
+	@RequestScoped//@RequestScoped - produzirá a cada requisicao de EM
 	public EntityManager getEntityManager() {
 		return emf.createEntityManager();
 	}

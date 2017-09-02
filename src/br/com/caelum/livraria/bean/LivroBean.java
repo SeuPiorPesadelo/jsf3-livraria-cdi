@@ -20,6 +20,7 @@ import br.com.caelum.livraria.dao.LivroDao;
 import br.com.caelum.livraria.modelo.Autor;
 import br.com.caelum.livraria.modelo.Livro;
 import br.com.caelum.livraria.modelo.LivroDataModel;
+import br.com.caelum.livraria.tx.Transacional;
 import br.com.caelum.livraria.util.RedirectView;
 
 //javax.faces.bean.ViewScoped.ViewScoped NÃO funciona com CDI
@@ -81,6 +82,8 @@ public class LivroBean implements Serializable {
 		this.livroDataModel = livroDataModel;
 	}
 
+	//anotacao criada p/ centralizar abertura e fechamento de transacoes de metodos q necessitam disto
+	@Transacional
 	public void gravar() {
 		System.out.println("Gravando livro " + this.livro.getTitulo());
 		if (livro.getAutores().isEmpty()) {
@@ -107,10 +110,13 @@ public class LivroBean implements Serializable {
 		livro.adicionaAutor(buscaPorId);
 	}
 	
+	@Transacional
 	public void remover(Livro l) {
 		System.out.println("deletou");
+		//dá um find pro objeto sair de detached
+		//e ficar managed pra poder deletar
+		l = livroDao.carregaPelaId(l.getId());
 		livroDao.remove(l);
-		livros.remove(l);
 	}
 
 	public List<Autor> getAutoresDoLivro() {

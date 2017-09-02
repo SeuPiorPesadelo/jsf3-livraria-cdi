@@ -18,25 +18,15 @@ public class DAO<T> implements Serializable {
 	}
 
 	public void adiciona(T t) {
-		// abre transacao
-		em.getTransaction().begin();
-		// persiste o objeto
 		em.persist(t);
-		// commita a transacao
-		em.getTransaction().commit();
 	}
 
 	public void remove(T t) {
-		em.getTransaction().begin();
-		em.remove(em.merge(t));
-		em.getTransaction().commit();
-		em.close();
+		em.remove(t);
 	}
 
 	public void atualiza(T t) {
-		em.getTransaction().begin();
 		em.merge(t);
-		em.getTransaction().commit();
 	}
 
 	public List<T> listaTodos() {
@@ -53,7 +43,6 @@ public class DAO<T> implements Serializable {
 
 	public int contaTodos() {
 		long result = (Long) em.createQuery("select count(n) from livro n").getSingleResult();
-
 		return (int) result;
 	}
 

@@ -9,6 +9,7 @@ import javax.inject.Named;
 
 import br.com.caelum.livraria.dao.AutorDao;
 import br.com.caelum.livraria.modelo.Autor;
+import br.com.caelum.livraria.tx.Transacional;
 import br.com.caelum.livraria.util.RedirectView;
 
 //@ManagedBean é do mundo JSF
@@ -54,6 +55,7 @@ public class AutorBean implements Serializable {
 		this.autores = autores;
 	}
 
+	@Transacional
 	public void gravar() {
 		System.out.println("Gravando autor " + this.autor.getNome());
 		if(this.autor.getId() == null){
@@ -70,6 +72,7 @@ public class AutorBean implements Serializable {
 		return new RedirectView("livro");
 	}
 
+	@Transacional
 	public void deletaAutores(Autor a) {
 		autorDao.remove(a);
 		System.out.println("Atribuiu nulo");
