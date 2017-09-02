@@ -21,6 +21,8 @@ public class LoginBean implements Serializable {
 	@Inject
 	private UsuarioDao usuarioDao;
 	private Usuario usuario = new Usuario();
+	@Inject
+	private FacesContext fc;
 
 	public Usuario getUsuario() {
 		return usuario;
@@ -28,7 +30,7 @@ public class LoginBean implements Serializable {
 
 	public RedirectView efetuarLogin(){
 		boolean existe = usuarioDao.existe(this.usuario);
-		FacesContext fc = FacesContext.getCurrentInstance();
+		fc = FacesContext.getCurrentInstance();
 		if(existe){
 			//guarda os dados do usuario na chave usuarioLogado
 			fc.getExternalContext().getSessionMap().put("usuarioLogado", this.usuario);
@@ -46,7 +48,7 @@ public class LoginBean implements Serializable {
 	}
 
 	public RedirectView deslogar(){
-		FacesContext fc = FacesContext.getCurrentInstance();
+		fc = FacesContext.getCurrentInstance();
 		//remove o usuario logado
 		fc.getExternalContext().getSessionMap().remove("usuarioLogado");
 		return new RedirectView("login");

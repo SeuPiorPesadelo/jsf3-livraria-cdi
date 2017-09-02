@@ -45,6 +45,8 @@ public class LivroBean implements Serializable {
 	private LivroDao livroDao;
 	@Inject
 	private AutorDao autorDao;
+	@Inject
+	private FacesContext fc;
 
 	public List<String> getGeneros() {
 	    return generos;
@@ -89,7 +91,7 @@ public class LivroBean implements Serializable {
 		if (livro.getAutores().isEmpty()) {
 			// p/ personalizacao de mensagem é necessário no 1º param o client
 			// Id, e no 2º a mensagem
-			FacesContext.getCurrentInstance().addMessage("autor",
+			fc.addMessage("autor",
 					new FacesMessage("Livro deve ter pelo menos um autor"));
 		}
 		if (this.livro.getId() == null) {
@@ -101,7 +103,7 @@ public class LivroBean implements Serializable {
 		livro = new Livro();
 		
 //		faz resetar os valores do filtro da Criteria da dataTable de livros
-		DataTable dataTable = (DataTable) FacesContext.getCurrentInstance().getViewRoot().findComponent("formTabelaLivros:tabelaLivros");
+		DataTable dataTable = (DataTable) fc.getViewRoot().findComponent("formTabelaLivros:tabelaLivros");
 		dataTable.reset();
 	}
 
